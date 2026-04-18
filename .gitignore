@@ -1,0 +1,54 @@
+# .NET
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.rsuser
+*.aps
+*.ncb
+*.ide
+*.suo
+*.user
+*.cache
+*.db
+*.db-shm
+*.db-wal
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+project.nuget.cache
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Rider
+.idea/
+*.sln.im
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
