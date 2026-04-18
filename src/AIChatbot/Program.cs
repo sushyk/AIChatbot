@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.AI;
 using OllamaSharp;
+using System.Text;
 
 List<ChatMessage> chatHistory =
 [
@@ -8,7 +9,7 @@ List<ChatMessage> chatHistory =
 
 IChatClient chatClient = new OllamaApiClient("http://localhost:11434", "smollm2:135M");
 
-string userInput = string.Empty;
+string userInput;
 
 while (true)
 {
@@ -16,17 +17,20 @@ while (true)
     userInput = Console.ReadLine() ?? string.Empty;
     chatHistory.Add(new ChatMessage(ChatRole.User, userInput));
 
-    ChatResponse response = await chatClient.GetResponseAsync(chatHistory);
-
     Console.Write("\nChatbot: \n\n");
-    foreach (var message in response.Messages)
+
+    StringBuilder llmResponseBuffer = new StringBuilder();
+    IAsyncEnumerable<ChatResponseUpdate> updates = chatClient.GetStreamingResponseAsync(chatHistory);
+
+    await foreach (var update in updates)
     {
-        Console.WriteLine(message.Text);
-        Console.Write("\n");
+        Console.Write(update.Text);
+
+        llmResponseBuffer.Append(update.Text);
+        llmResponseBuffer.Append(' ');
     }
 
-    var chatResponses = response.Messages.Select(m => new ChatMessage(ChatRole.Assistant, m.Text)).ToList();
-    chatHistory.AddRange(chatResponses);
+    chatHistory.Add(new ChatMessage(ChatRole.Assistant, llmResponseBuffer.ToString()));
 
-    Console.Write("\n");
+    Console.Write("\n\n");
 }
