@@ -1,36 +1,19 @@
-﻿using Microsoft.Extensions.AI;
+﻿using AIChatbot;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OllamaSharp;
 using System.Text;
 
-List<ChatMessage> chatHistory =
-[
-    new(ChatRole.System, "Answer all my questions remembering my conversation history"),
-];
+HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 
-IChatClient chatClient = new OllamaApiClient("http://localhost:11434", "smollm2:135M");
+builder.Services.AddChatClient(new OllamaApiClient("http://localhost:11434", "smollm2:135M"));
 
-string userInput;
+builder.Services.AddSingleton<Chatbot>();
 
-while (true)
-{
-    Console.Write("You: \n\n");
-    userInput = Console.ReadLine() ?? string.Empty;
-    chatHistory.Add(new ChatMessage(ChatRole.User, userInput));
+IHost app = builder.Build();
 
-    Console.Write("\nChatbot: \n\n");
+var chatBot = app.Services.GetRequiredService<Chatbot>();
 
-    StringBuilder llmResponseBuffer = new StringBuilder();
-    IAsyncEnumerable<ChatResponseUpdate> updates = chatClient.GetStreamingResponseAsync(chatHistory);
+await chatBot.StartChatSession();
 
-    await foreach (var update in updates)
-    {
-        Console.Write(update.Text);
-
-        llmResponseBuffer.Append(update.Text);
-        llmResponseBuffer.Append(' ');
-    }
-
-    chatHistory.Add(new ChatMessage(ChatRole.Assistant, llmResponseBuffer.ToString()));
-
-    Console.Write("\n\n");
-}
